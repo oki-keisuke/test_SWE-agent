@@ -1,0 +1,39 @@
+
+diff --git a/src/_pytest/_io/terminalwriter.py b/src/_pytest/_io/terminalwriter.py
+index bf9b766..6f50650 100644
+--- a/src/_pytest/_io/terminalwriter.py
++++ b/src/_pytest/_io/terminalwriter.py
+@@ -224,8 +224,7 @@ class TerminalWriter:
+                     ),
+                 )
+                 # pygments terminal formatter may add a newline when there wasn't one.
+-                # We don't want this, remove.
+-                if highlighted[-1] == "\n" and source[-1] != "\n":
++                if highlighted and highlighted[-1] == "\n" and not source.endswith("\n"):
+                     highlighted = highlighted[:-1]
+ 
+                 # Some lexers will not set the initial color explicitly
+diff --git a/test_highlight.py b/test_highlight.py
+new file mode 100644
+index 0000000..938992f
+--- /dev/null
++++ b/test_highlight.py
+@@ -0,0 +1,18 @@
++import sys
++sys.path.insert(0, '/pytest-dev__pytest/src')
++
++from _pytest._io.terminalwriter import TerminalWriter
++
++# Create a TerminalWriter instance
++tw = TerminalWriter()
++
++# Simulate an empty source string
++source = ''
++
++# Call the _highlight method which previously caused an IndexError
++# We are using a try-except block to catch any exceptions and print an appropriate message
++try:
++    highlighted = tw._highlight(source)
++    print("No IndexError, _highlight method works as expected with an empty source string.")
++except IndexError:
++    print("IndexError occurred, the issue is not resolved.")
